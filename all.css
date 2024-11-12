@@ -16,6 +16,11 @@ pre {
 	background-color: rgb(231, 231, 231);
 }
 
+ul.index {
+	padding-left: 0;
+	list-style-position: inside;
+}
+
 pre kw /* keyword */ {
 	color:rgb(115, 17, 185);
 }
