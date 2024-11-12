@@ -1,0 +1,31 @@
+body {
+    margin: 20px 0px 0px 50px;
+    max-width: 1000px;
+    font-family: 'Merriweather', 'serif';
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Lusitana', 'serif';
+}
+
+pre {
+    font-family: 'Lucida Console', 'Courier New', 'monospace';
+    overflow-x: auto;
+    color: slategray;
+}
+
+pre kw {
+    color:rgb(115, 17, 185);
+}
+
+pre vr {
+    color: black;
+}
+
+pre fn {
+    color:rgb(32, 94, 175);
+}
+
+pre cm {
+    color: rgb(17, 104, 43);
+}
