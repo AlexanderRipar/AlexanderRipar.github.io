@@ -1,31 +1,33 @@
 body {
-    margin: 20px 0px 0px 50px;
-    max-width: 1000px;
-    font-family: 'Merriweather', 'serif';
+	margin: 20px 0px 0px 50px;
+	max-width: 1000px;
+	font-family: 'Merriweather', 'serif';
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Lusitana', 'serif';
+	font-family: 'Lusitana', 'serif';
 }
 
 pre {
-    font-family: 'Lucida Console', 'Courier New', 'monospace';
-    overflow-x: auto;
-    color: slategray;
+	font-family: 'Lucida Console', 'Courier New', 'monospace';
+	overflow-x: auto;
+	color:rgb(50, 50, 50);
+	width: 95%;
+	background-color: rgb(231, 231, 231);
 }
 
-pre kw {
-    color:rgb(115, 17, 185);
+pre kw /* keyword */ {
+	color:rgb(115, 17, 185);
 }
 
-pre vr {
-    color: black;
+pre vr /* variable */ {
+	color: black;
 }
 
-pre fn {
-    color:rgb(32, 94, 175);
+pre fn /* function */ {
+	color:rgb(32, 94, 175);
 }
 
-pre cm {
-    color: rgb(17, 104, 43);
+pre cm /* comment */ {
+	color: rgb(17, 104, 43);
 }
