@@ -1,5 +1,5 @@
 body {
-	margin: 20px 0px 0px 50px;
+	margin: 3vh 3.5vw 2vh 3.5vw;
 	max-width: 1000px;
 	font-family: 'Merriweather', 'serif';
 }
@@ -12,7 +12,7 @@ pre {
 	font-family: 'Lucida Console', 'Courier New', 'monospace';
 	overflow-x: auto;
 	color:rgb(50, 50, 50);
-	width: 95%;
+	max-width: 100%;
 	background-color: rgb(231, 231, 231);
 }
 
