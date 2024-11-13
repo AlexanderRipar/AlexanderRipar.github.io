@@ -1,11 +1,11 @@
 body {
 	margin: 3vh 3.5vw 5vh 3.5vw;
 	max-width: 1000px;
-	font-family: 'Merriweather', 'serif';
+	font-family: "Merriweather", serif;
 }
 
 h1 {
-	font-family: 'Lusitana', 'serif';
+	font-family: "Lusitana", serif;
 	margin: 1rem 0 0.5rem 0;
 }
 
@@ -31,7 +31,7 @@ ul.index {
 /* Code Highlighting */
 
 .code {
-	font-family: 'Lucida Console', 'Courier New', monospace;
+	font-family: "Lucida Console", "Courier New", monospace;
 	overflow-x: auto;
 	color:rgb(50, 50, 50);
 	max-width: 100%;
