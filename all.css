@@ -31,7 +31,7 @@ ul.index {
 /* Code Highlighting */
 
 .code {
-	font-family: 'Lucida Console', 'Courier New', 'monospace';
+	font-family: 'Lucida Console', 'Courier New', monospace;
 	overflow-x: auto;
 	color:rgb(50, 50, 50);
 	max-width: 100%;
