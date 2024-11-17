@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<link rel="stylesheet" href="../all.css">
+		<title>Language Design is my Passion</title>
+	</head>
+	<body>
+		<h1>Language Design is my Passion</h1>
+		<p class="postheader">2024/11/17</p>
+		<p>
+			Like many other programmers I find way too much joy on working on
+			&mdash; programming &mdash; programming tools. <br>
+			My main interest in this area are programming languages. Whether as
+			Domain Specific Languages embedded into a larger program to
+			increase flexibility of certain components, or as a means of
+			expressing entire programs.
+		</p>
+		<p>
+			Especially the latter and I have a particularly vexxing
+			relationship. I do not know whether this is specific to me or a
+			problem for the wider population, but sometimes there just comes a
+			moment where I do something &mdash; in this case writing some C++
+			code &mdash; and then I think: "Wait a minute, I can do better than
+			that". Not in relation to the thing I am currently doing &mdash;
+			the doubtlessly improvable code &mdash; but rather regarding the
+			underlying medium &mdash; the language itself. I think "I can
+			write a better programming language than C++". <br>
+			Seeing how C++ is an odd amalgam that has over the years attracted
+			just as much if not more &mdash; or at least more vocally
+			expressed &mdash; and anger desperation as it has admiration, this
+			does not in and of itself strike me as a stupid thought. <br>
+			Seeing however how I am not particularly good at completing even my
+			smaller hobby projects, embarking on defining and implementing
+			<em>an entire language</em>, not just for amusement but for
+			subsequent use, might be a bit far fetched for me.
+		</p>
+		<p>
+			Nonetheless, I embarked on this journey more than a year ago now,
+			having admittedly not all that much to show for it yet. <br>
+			By now I have tinkered with the grammar, written and rewritten its
+			parser, and the to-be language's semantics multiple times, but have
+			not yet gotten to the point of having a functioning typechecker.
+		</p>
+		<p>
+			However, even given this incomplete &mdash; and, even worse, not
+			yet properly testable &mdash; language, I at least have a set of
+			functional constraints which I expect an eventual complete
+			implementation to adhere to.
+		</p>
+		<p>
+			Firstly, I'd like to have all &mdash; and I do mean <em>all</em>,
+			and then some &mdash; available at compile time. <br>
+			This includes side-effecting actions such as file or network
+			access, but also stuff that is limited to compile time, such as
+			rich type information.
+		</p>
+		<p>
+			This gives me all sorts of nice and tingly thoughts about how this
+			might provide a nice intersection between the ergonomics and
+			expressiveness resulting from the introspective type systems of
+			high level languages and the performance of a static low-level
+			system that, among other amenities, usually dispenses with runtime
+			type information in its entirety, or at best limits it to debug
+			printing and such.
+		</p>
+		<p>
+			Secondly, types will be first class <em>compile-time</em> data
+			types. Basically, this means that type information is not just
+			available for reading, but also for creating new data types. <br>
+			This means that it should suffice to provide a set of functions
+			used to define and manipulate raw types, with e.g.
+			<span class="code"><kwd>struct</kwd></span> or
+			<span class="code"><kwd>union</kwd></span> being built as functions
+			on top of them.
+		</p>
+		<p>
+			Thirdly, initialization. Every variable you use needs to be
+			initialized <em>somewehere</em>, so initialization seems to me like
+			quite a big deal, purely by virtue of how much code deals with it.
+			<br>
+			What I want to categorically avoid is the C89 initialization idiom,
+			which I sadly also use in C++ a lot as a poor programmer's builder
+			pattern:
+			<pre class="code">
+<typ>ComplexStruct</typ> <vrb>s</vrb>;
+<vrb>s</vrb>.<vrb>x</vrb> = <fun>something()</fun>;
+<vrb>s</vrb>.<vrb>y</vrb> = 2;
+<vrb>s</vrb>.<vrb>z</vrb>.<vrb>u</vrb> = <vrb>a</vrb>;
+<vrb>s</vrb>.<vrb>z</vrb>.<vrb>v</vrb> = <vrb>b</vrb>;</pre>
+			Compared to this, I consider C++ initializer lists a step in the
+			right direction and directly back towards general sadness at the
+			same time; While they allow terse initialization, they also
+			prohibit named initialization. <br>
+			This may be fine for the simple case of
+			<span class="code"><typ>IVec2</typ> <vrb>v</vrb>{ 42, 7 }</span>,
+			but quickly breaks down when considering more complex structures
+			such as those commonly used by graphics APIs such as DX12 or
+			Vulkan &mdash; just try remembering which true and which false of a
+			config struct correspond to toggling which behaviours five days
+			after writing something. <br>
+			Even more annoyingly, these initialization difficulties lead to
+			weird "patterns" such as Builders or two-member
+			<span class="code">enum</span>s for clarifying the meaning of
+			boolean arguments to the unitiated reader. These are, to the last
+			of them, crutches for suboptimal language design. I don't want to
+			need them, and I will not miss them.
+		</p>
+		<p>
+			This is just a quick outline of what I currently consider the three
+			immovable pillars of my language design.
+			Even though I could elaborate further, that will have to wait,
+			seeing as it is almost <a href="./hello-internet.html">midnight of
+			sunday, the 17<sup>th</sup> of November, 2024</a>. <br>
+			Thus, you can look forward to me rambling about each of the above
+			points (and then some) in future posts. Bye!
+		</p>
+	</body>
+</html>
