@@ -17,7 +17,7 @@
 			expressing entire programs.
 		</p>
 		<p>
-			Especially the latter and I have a particularly vexxing
+			Especially with the latter I have a particularly vexxing
 			relationship. I do not know whether this is specific to me or a
 			problem for the wider population, but sometimes there just comes a
 			moment where I do something &mdash; in this case writing some C++
@@ -27,9 +27,9 @@
 			underlying medium &mdash; the language itself. I think "I can
 			write a better programming language than C++". <br>
 			Seeing how C++ is an odd amalgam that has over the years attracted
-			just as much if not more &mdash; or at least more vocally
-			expressed &mdash; and anger desperation as it has admiration, this
-			does not in and of itself strike me as a stupid thought. <br>
+			just as much if not more anger and desperation as it has
+			admiration, this does not in and of itself strike me as a stupid
+			thought. <br>
 			Seeing however how I am not particularly good at completing even my
 			smaller hobby projects, embarking on defining and implementing
 			<em>an entire language</em>, not just for amusement but for
@@ -49,8 +49,9 @@
 			implementation to adhere to.
 		</p>
 		<p>
-			Firstly, I'd like to have all &mdash; and I do mean <em>all</em>,
-			and then some &mdash; available at compile time. <br>
+			Firstly, I'd like to have all language facilites &mdash; and I do
+			mean <em>all</em>, and then some &mdash; available at compile time.
+			<br>
 			This includes side-effecting actions such as file or network
 			access, but also stuff that is limited to compile time, such as
 			rich type information.
@@ -82,12 +83,14 @@
 			What I want to categorically avoid is the C89 initialization idiom,
 			which I sadly also use in C++ a lot as a poor programmer's builder
 			pattern:
+		</p>
 			<pre class="code">
 <typ>ComplexStruct</typ> <vrb>s</vrb>;
 <vrb>s</vrb>.<vrb>x</vrb> = <fun>something</fun>();
 <vrb>s</vrb>.<vrb>y</vrb> = 2;
 <vrb>s</vrb>.<vrb>z</vrb>.<vrb>u</vrb> = <vrb>a</vrb>;
 <vrb>s</vrb>.<vrb>z</vrb>.<vrb>v</vrb> = <vrb>b</vrb>;</pre>
+		<p>
 			Compared to this, I consider C++ initializer lists a step in the
 			right direction and directly back towards general sadness at the
 			same time; While they allow terse initialization, they also
