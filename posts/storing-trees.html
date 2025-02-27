@@ -78,26 +78,26 @@
 <pre class="code">
 <kwd>enum</kwd> <typ>AstTag</typ> {
     <vrb>DefinitionTag</vrb>,
-	<vrb>AddTag</vrb>,
-	<vrb>NumberTag</vrb>,
-	<com>// ...</com>
+    <vrb>AddTag</vrb>,
+    <vrb>NumberTag</vrb>,
+    <com>// ...</com>
 };
 
 <kwd>struct</kwd> <typ>AstDefinition</typ> {
     <typ>AstTag</typ> <vrb>tag</vrb> = <vrb>DefinitionTag</vrb>;
-	<kwd>const</kwd> <kwd>char</kwd>* <vrb>name</vrb>;
-	<typ>AstTag</typ>* <vrb>value</vrb>;
+    <kwd>const</kwd> <kwd>char</kwd>* <vrb>name</vrb>;
+    <typ>AstTag</typ>* <vrb>value</vrb>;
 };
 
 <kwd>struct</kwd> <typ>AstAdd</typ> {
-	<typ>AstTag</typ> <vrb>tag</vrb>;
-	<typ>AstTag</typ>* <vrb>lhs</vrb>;
-	<typ>AstTag</typ>* <vrb>rhs</vrb>;
+    <typ>AstTag</typ> <vrb>tag</vrb>;
+    <typ>AstTag</typ>* <vrb>lhs</vrb>;
+    <typ>AstTag</typ>* <vrb>rhs</vrb>;
 };
 
 <kwd>struct</kwd> <typ>AstNumber</typ> {
-	<typ>AstTag</typ> <vrb>tag</vrb>;
-	<typ>int32_t</typ> <vrb>value</vrb>;<sup><a id="ref-number-size" href="#note-number-size">1</a></sup>
+    <typ>AstTag</typ> <vrb>tag</vrb>;
+    <typ>int32_t</typ> <vrb>value</vrb>;<sup><a id="ref-number-size" href="#note-number-size">1</a></sup>
 };
 </pre>
 		<p>
