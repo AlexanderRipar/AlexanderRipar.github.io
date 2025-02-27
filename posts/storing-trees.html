@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<link rel="stylesheet" href="../all.css">
+		<title>Storing Trees</title>
+	</head>
+	<body>
+		<h1>Storing Trees</h1>
+		<p class="subtitle">2025/02/27</p>
+		<p>
+			This is the first post in a series on how Abstract Syntax Trees are
+			currently represented and used in my compiler project. <br>
+			This post focuses on the representation of ASTs, with follow-ups
+			regarding creation and a C++ based interface to the AST planned for
+			future posts. 
+		</p>
+		<p>
+			When parsing formal languages, one inevitably encounters Abstract
+			Syntax Trees - ASTs for short. <br>
+			In an AST each semantically relevant element of a source program is
+			represented by a node in the tree; As a concrete example, the
+			program fragment
+			<span class="code"><kwd>let</kwd> <vrb>x</vrb> = 5 + 1</span> might
+			be represented as the following tree:
+		</p>
+		<svg class="tree-diagram" viewbox="0 0 200 51">
+			<rect x="80" y="2.5" rx="3" ry="3" width="40" height="12"/>
+			<text x="100" y="6.5" font-size="5">Definition</text>
+			<text x="100" y="12" font-size="4">name: x</text>
+
+			<rect x="80" y="19.5" rx="3" ry="3" width="40" height="12"/>
+			<text x="100" y="23.5" font-size="5">Add</text>
+
+			<rect x="55" y="36.5" rx="3" ry="3" width="40" height="12"/>
+			<text x="75" y="40.5" font-size="5">Number</text>
+			<text x="75" y="46" font-size="4">value: 5</text>
+
+			<rect x="105" y="36.5" rx="3" ry="3" width="40" height="12"/>
+			<text x="125" y="40.5" font-size="5">Number</text>
+			<text x="125" y="46" font-size="4">value: 1</text>
+
+			<line x1="100" y1="14.5" x2="100" y2="19.5"/>
+
+			<line x1="95" y1="31.5" x2="75" y2="36.5"/>
+
+			<line x1="105" y1="31.5" x2="125" y2="36.5"/>
+		</svg>
+		<p>
+			However, we could also represent it in a JSON-like textual
+			structure:
+		</p>
+		<pre class="code">
+{
+  "tag": "Definition",
+  "name": "x",
+  "value": {
+    "tag": "Add",
+    "lhs": {
+      "tag": "Number",
+      "value": 5
+    },
+    "rhs": {
+      "tag": "Number",
+      "value": 1
+    }
+  }
+}</pre>
+		<p>
+			While this is already more machine-readable than a graphical
+			representation, it is still geared towards human readability, which
+			is probably not our priority, as ASTs are mainly consumed by
+			further analysis stages. <br>
+			Instead, we might opt for a representation using pointers to tagged
+			structures (or polymorphic classes, depending on the language at
+			hand):
+		</p>
+<pre class="code">
+<kwd>enum</kwd> <typ>AstTag</typ> {
+    <vrb>DefinitionTag</vrb>,
+	<vrb>AddTag</vrb>,
+	<vrb>NumberTag</vrb>,
+	<com>// ...</com>
+};
+
+<kwd>struct</kwd> <typ>AstDefinition</typ> {
+    <typ>AstTag</typ> <vrb>tag</vrb> = <vrb>DefinitionTag</vrb>;
+	<kwd>const</kwd> <kwd>char</kwd>* <vrb>name</vrb>;
+	<typ>AstTag</typ>* <vrb>value</vrb>;
+};
+
+<kwd>struct</kwd> <typ>AstAdd</typ> {
+	<typ>AstTag</typ> <vrb>tag</vrb>;
+	<typ>AstTag</typ>* <vrb>lhs</vrb>;
+	<typ>AstTag</typ>* <vrb>rhs</vrb>;
+};
+
+<kwd>struct</kwd> <typ>AstNumber</typ> {
+	<typ>AstTag</typ> <vrb>tag</vrb>;
+	<typ>int32_t</typ> <vrb>value</vrb>;<sup><a id="ref-number-size" href="#note-number-size">1</a></sup>
+};
+</pre>
+		<p>
+			This already seems pretty machine-friendly, but we can do better:
+			Observe how a significant amount of the space in our nodes is
+			occupied by pointers to other nodes, with each pointer "owning"
+			the pointed-to node (otherwise we would be dealing with a graph,
+			and not a tree). <br>
+			Also observe that nodes consist of a "payload" whose layout depends
+			on their type -
+			<span class="code"><kwd>const</kwd> <kwd>char</kwd>* name</span> in
+			the case of <span class="code"><typ>AstDefinition</typ></span>,
+			nothing in the case of <span class="code"><typ>AstAdd</typ></span>
+			- and zero or more child nodes, which are currently accessed
+			through pointers.
+		</p>
+		<p>
+			We can thus define our nodes as consisting of a tag, a
+			payload, and a variable number of child nodes
+			that are not referenced from anywhere else. <br>
+			Thus, there is nothing keeping us from simply storing the child
+			nodes right after the node's tag, meaning we can store the AST in a
+			contiguous buffers. This improves data locality through the
+			contiguous layout and also the overall size decreased resulting
+			from the removal of pointers.
+		</p>
+		<svg class="memory-diagram" viewbox="0 0 200 30">
+			<rect x="50" y="2.5" width="25" height="25"/>
+			<text x="62.5" y="12" font-size="4">Definition</text>
+			<text x="62.5" y="16.5" font-size="3">name: x</text>
+
+			<rect x="75" y="2.5" width="25" height="25"/>
+			<text x="87.5" y="12" font-size="4">Add</text>
+
+			<rect x="100" y="2.5" width="25" height="25"/>
+			<text x="112.5" y="12" font-size="4">Number</text>
+			<text x="112.5" y="16.5" font-size="3">value: 5</text>
+
+			<rect x="125" y="2.5" width="25" height="25"/>
+			<text x="137.5" y="12" font-size="4">Number</text>
+			<text x="137.5" y="16.5" font-size="3">value: 1</text>
+		</svg>
+		<p>
+			Well, that seems wrong though. We've just lost the information that
+			<span class="code">Add</span> is a child of
+			<span class="code">Definition</span> and the two
+			<span class="code">Number</span>s are in turn children of the
+			<span class="code">Add</span>. To re-establish this, we include the
+			number of children in each node, alongside a flag indicating
+			whether the current node has a next sibling:
+		</p>
+		<svg class="memory-diagram" viewbox="0 0 200 30">
+			<rect x="50" y="2.5" width="100" height="25"/>
+			<text x="62.5" y="12" font-size="4">Definition</text>
+			<text x="62.5" y="16.5" font-size="3">children: 1</text>
+			<text x="62.5" y="20" font-size="3">has_next: false</text>
+			<text x="62.5" y="23.5" font-size="3">name: x</text>
+
+			<rect x="75" y="5" width="75" height="22.5"/>
+			<text x="87.5" y="12" font-size="4">Add</text>
+			<text x="87.5" y="16.5" font-size="3">has_next: false</text>
+			<text x="87.5" y="20" font-size="3">children: 1</text>
+
+			<rect x="100" y="7.5" width="25" height="20"/>
+			<text x="112.5" y="12" font-size="4">Number</text>
+			<text x="112.5" y="16.5" font-size="3">children: 0</text>
+			<text x="112.5" y="20" font-size="3">has_next: true</text>
+			<text x="112.5" y="23.5" font-size="3">value: 5</text>
+
+			<rect x="125" y="7.5" width="25" height="20"/>
+			<text x="137.5" y="12" font-size="4">Number</text>
+			<text x="137.5" y="16.5" font-size="3">children: 0</text>
+			<text x="137.5" y="20" font-size="3">has_next: false</text>
+			<text x="137.5" y="23.5" font-size="3">value: 1</text>
+		</svg>
+		<p>
+			When we want to find the next sibling of a node this now means that
+			we need to recursively skip all its children and their children. To
+			support sibling traversal in constant time we will instead track
+			the offset to the next sibling. In case there is no next sibling we
+			will imagine a pseudo-node in its place and store the offset to
+			that
+			<sup><a id="ref-offset-size-equivalence" href="#note-offset-size-equivalence">2</a></sup>. 
+		</p>
+		<svg class="memory-diagram" viewbox="0 0 200 30">
+			<rect x="50" y="2.5" width="100" height="25"/>
+			<text x="62.5" y="12" font-size="4">Definition</text>
+			<text x="62.5" y="16.5" font-size="3">next_offset: 4</text>
+			<text x="62.5" y="20" font-size="3">has_next: false</text>
+			<text x="62.5" y="23.5" font-size="3">name: x</text>
+
+			<rect x="75" y="5" width="75" height="22.5"/>
+			<text x="87.5" y="12" font-size="4">Add</text>
+			<text x="87.5" y="16.5" font-size="3">next_offset: 3</text>
+			<text x="87.5" y="20" font-size="3">has_next: false</text>
+
+			<rect x="100" y="7.5" width="25" height="20"/>
+			<text x="112.5" y="12" font-size="4">Number</text>
+			<text x="112.5" y="16.5" font-size="3">next_offset: 1</text>
+			<text x="112.5" y="20" font-size="3">has_next: true</text>
+			<text x="112.5" y="23.5" font-size="3">value: 5</text>
+
+			<rect x="125" y="7.5" width="25" height="20"/>
+			<text x="137.5" y="12" font-size="4">Number</text>
+			<text x="137.5" y="16.5" font-size="3">next_offset: 1</text>
+			<text x="137.5" y="20" font-size="3">has_next: false</text>
+			<text x="137.5" y="23.5" font-size="3">value: 1</text>
+		</svg>
+		<p>
+			So far we have handwaved the storage of our nodes' payloads. In
+			practice the payload's length will be determined by the node's tag,
+			so we can infer it through a lookup. Alternatively, we can simply
+			store it inline to avoid the indirection incurred by a lookup table
+			- a byte or even a few bits taken from the tag should suffice, as
+			payloads are expected to be pretty small. Together with alignment
+			requirements <sup><a id="ref-node-alignment" href="#note-node-alignment">3</a></sup>
+			on nodes this means in-line storage of the payload's size is
+			practically free. <br>
+			During traversal, we can then skip ahead by the stored size to find
+			the next children, treating the payload as opaque. Since the
+			payload can only be meaningfully accessed in dependence on the
+			associated tag anyways (i.e., not during traversal), no
+			functionality is lost through this abstraction. <br>
+			One concrete byte-for-byte representation might then look something
+			like the following:
+		</p>
+		<svg class="memory-diagram" viewbox="0 0 190 45">
+			<rect x="15" y="7.5" width="5" height="35"/>
+			<g transform="translate(17.5, 25)"><text font-size="3" transform="rotate(90)">Definition / false</text></g>
+
+			<rect x="20" y="7.5" width="5" height="35"/>
+			<g transform="translate(22.5, 25)"><text font-size="3" transform="rotate(90)">payload_size: 8</text></g>
+
+			<rect x="25" y="7.5" width="10" height="35"/>
+			<g transform="translate(30, 25)"><text font-size="3" transform="rotate(90)">next_offset: 32</text></g>
+
+			<rect x="35" y="7.5" width="40" height="35"/>
+			<text x="55" y="25" font-size="3">name: "x"</text>
+
+			<rect x="75" y="7.5" width="5" height="35"/>
+			<g transform="translate(77.5, 25)"><text font-size="3" transform="rotate(90)">Add / false</text></g>
+
+			<rect x="80" y="7.5" width="5" height="35"/>
+			<g transform="translate(82.5, 25)"><text font-size="3" transform="rotate(90)">payload_size: 0</text></g>
+
+			<rect x="85" y="7.5" width="10" height="35"/>
+			<g transform="translate(90, 25)"><text font-size="3" transform="rotate(90)">next_offset: 20</text></g>
+
+			<rect x="95" y="7.5" width="5" height="35"/>
+			<g transform="translate(97.5, 25)"><text font-size="3" transform="rotate(90)">Num / true</text></g>
+
+			<rect x="100" y="7.5" width="5" height="35"/>
+			<g transform="translate(102.5, 25)"><text font-size="3" transform="rotate(90)">payload_size: 4</text></g>
+
+			<rect x="105" y="7.5" width="10" height="35"/>
+			<g transform="translate(110, 25)"><text font-size="3" transform="rotate(90)">next_offset: 8</text></g>
+
+			<rect x="115" y="7.5" width="20" height="35"/>
+			<text x="125" y="25" font-size="3">value: 5</text>
+
+			<rect x="135" y="7.5" width="5" height="35"/>
+			<g transform="translate(137.5, 25)"><text font-size="3" transform="rotate(90)">Num / false</text></g>
+
+			<rect x="140" y="7.5" width="5" height="35"/>
+			<g transform="translate(142.5, 25)"><text font-size="3" transform="rotate(90)">payload_size: 4</text></g>
+
+			<rect x="145" y="7.5" width="10" height="35"/>
+			<g transform="translate(150, 25)"><text font-size="3" transform="rotate(90)">next_offset: 8</text></g>
+
+			<rect x="155" y="7.5" width="20" height="35"/>
+			<text x="165" y="25" font-size="3">value: 1</text>
+
+			<g font-size="3">
+				<text x="17.5" y="5">0</text>
+				<text x="22.5" y="5">1</text>
+				<text x="27.5" y="5">2</text>
+				<text x="32.5" y="5">3</text>
+				<text x="37.5" y="5">4</text>
+				<text x="42.5" y="5">5</text>
+				<text x="47.5" y="5">6</text>
+				<text x="52.5" y="5">7</text>
+				<text x="57.5" y="5">8</text>
+				<text x="62.5" y="5">9</text>
+				<text x="67.5" y="5">10</text>
+				<text x="72.5" y="5">11</text>
+				<text x="77.5" y="5">12</text>
+				<text x="82.5" y="5">13</text>
+				<text x="87.5" y="5">14</text>
+				<text x="92.5" y="5">15</text>
+				<text x="97.5" y="5">16</text>
+				<text x="102.5" y="5">17</text>
+				<text x="107.5" y="5">18</text>
+				<text x="112.5" y="5">19</text>
+				<text x="117.5" y="5">20</text>
+				<text x="122.5" y="5">21</text>
+				<text x="127.5" y="5">22</text>
+				<text x="132.5" y="5">23</text>
+				<text x="137.5" y="5">24</text>
+				<text x="142.5" y="5">25</text>
+				<text x="147.5" y="5">26</text>
+				<text x="152.5" y="5">27</text>
+				<text x="157.5" y="5">28</text>
+				<text x="162.5" y="5">29</text>
+				<text x="167.5" y="5">30</text>
+				<text x="172.5" y="5">31</text>
+			</g>
+		</svg>
+		<p>
+			Here, offsets and sizes are counted in bytes; payload size is
+			stored as an 8-bit-, and the offset to the next sibling as a 16-bit
+			integer. The flag for whether there is a next sibling is stored in
+			the same byte as the tag. <br>
+			In a realistic scenario, next_offset would likely be a 32-bit
+			integer, with the resulting two bits of padding in the header used
+			to store additional flags or even inline small payloads entirely.
+		</p>
+		<p>
+			This pretty much covers the basics of how I represent ASTs in my
+			current compiler project. Next time we'll continue with how they
+			are built during parsing.
+		</p>
+
+		<h2>Notes</h2>
+		<p id="note-number-size">
+			Number values are represented here as 32-bit integers instead of
+			the likely more fitting 64-bit so that payloads aren't uniformly
+			sized.
+			(<a href="#ref-number-size">back</a>)
+		</p>
+		<p id="note-offset-size-equivalence">
+			2. Storing the offset to the next sibling is equivalent to storing
+			the size of all children and their (recursive) children. For me
+			personally it is easier to think in terms of the offset here, but
+			it does result in the odd edge case for last siblings.
+			(<a href="#ref-offset-size-equivalence">back</a>)
+		</p>
+		<p id="note-node-alignment">
+			3. Even if we assume unaligned payloads, the alignment requirement
+			is already imposed by the field storing the next-sibling-offset. If
+			we use a 32-bit integer for the offset, and a byte for the tag, we
+			get at least 3 bytes of padding in the header. If we use a 16-bit
+			integer, we get 1 byte. Payloads of course also need to have a size
+			that is a multiple of this alignment, meaning that we can save
+			additional bits when storing their size by dividing through the
+			alignment, or even the header's size (basically storing the size in
+			words or dwords instead of bytes. The same can then also be done
+			for sibling offsets). <br>
+			Realistically, there is also other data common to all nodes (for
+			example, flags) that will compete for space in the header (small
+			payloads might even be inlined entirely). Squeezing in a few bits
+			should still be possible though.
+			(<a href="#ref-node-alignment">back</a>)
+		</p>
+	</body>
+</html>

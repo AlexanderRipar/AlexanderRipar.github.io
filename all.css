@@ -122,3 +122,38 @@ pre.code {
 .code str /* string literal */ {
 	color: rgb(125, 87, 17);
 }
+
+.tree-diagram {
+	font-family: 'Computer Modern Typewriter', monospace;
+}
+
+.tree-diagram rect {
+	stroke: black;
+	stroke-width: 0.3;
+	fill: none;
+}
+
+.tree-diagram text {
+	text-anchor: middle;
+	dominant-baseline: central;
+}
+
+.tree-diagram line {
+	stroke: black;
+	stroke-width: 0.1;
+}
+
+.memory-diagram {
+	font-family: 'Computer Modern Typewriter', monospace;
+}
+
+.memory-diagram rect {
+	stroke: black;
+	stroke-width: 0.3;
+	fill: none;
+}
+
+.memory-diagram text {
+	text-anchor: middle;
+	dominant-baseline: central;
+}
