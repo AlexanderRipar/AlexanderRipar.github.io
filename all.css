@@ -68,20 +68,11 @@ h1 {
 	margin: 1rem 0 0.5rem 0;
 }
 
-h2 {
-	font-weight: bold;
-	margin: 1rem 0 1rem 0;
-}
-
-.postheader {
+.subtitle {
 	font-size: small;
 	font-style: italic;
 	color: dimgray;
 	margin: 0 0 2rem 0;
-}
-
-.footnote {
-	margin-top: 6rem;
 }
 
 p {
