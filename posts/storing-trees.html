@@ -98,7 +98,7 @@
 
 <kwd>struct</kwd> <typ>AstNumber</typ> {
     <typ>AstTag</typ> <vrb>tag</vrb>;
-    <typ>int32_t</typ> <vrb>value</vrb>;<sup><a id="ref-number-size" href="#note-number-size">1</a></sup>
+    <typ>int32_t</typ> <vrb>value</vrb>;<sup><a class="footnote" id="ref-number-size" href="#note-number-size">1</a></sup>
 };
 </pre>
 		<p>
@@ -178,7 +178,7 @@
 			support sibling traversal in constant time we will instead track
 			the offset to the next sibling. In case there is no next sibling we
 			will imagine a pseudo-node in its place and store the offset to
-			that.<sup><a id="ref-offset-size-equivalence" href="#note-offset-size-equivalence">2</a></sup>
+			that.<sup><a class="footnote" id="ref-offset-size-equivalence" href="#note-offset-size-equivalence">2</a></sup>
 		</p>
 		<svg class="memory-diagram" viewbox="0 0 200 30">
 			<rect x="50" y="2.5" width="100" height="25"/>
@@ -211,7 +211,7 @@
 			store it inline to avoid the indirection incurred by a lookup table
 			- a byte or even a few bits taken from the tag should suffice, as
 			payloads are expected to be pretty small. Together with alignment
-			requirements<sup><a id="ref-node-alignment" href="#note-node-alignment">3</a></sup>
+			requirements<sup><a class="footnote" id="ref-node-alignment" href="#note-node-alignment">3</a></sup>
 			on nodes this means in-line storage of the payload's size is
 			practically free. <br>
 			During traversal, we can then skip ahead by the stored size to find

@@ -80,6 +80,10 @@ p {
 	line-height: 1.6;
 }
 
+a.footnote:not(:hover) {
+	text-decoration: none;
+}
+
 /* index.html */
 
 ul.index {
