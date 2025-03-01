@@ -61,6 +61,7 @@ body {
 	margin: 3vh 3.5vw 5vh 3.5vw;
 	max-width: 800px;
 	font-family: 'Computer Modern Serif', serif;
+	font-variant-ligatures: none;
 }
 
 h1 {
