@@ -47,8 +47,8 @@
 			<line x1="105" y1="31.5" x2="125" y2="36.5"/>
 		</svg>
 		<p>
-			However, we could also represent it in a JSON-like textual
-			structure:
+			We could also represent the same data structure in a JSON-like
+			textual structure:
 		</p>
 		<pre class="code">
 {
@@ -69,11 +69,12 @@
 		<p>
 			While this is already more machine-readable than a graphical
 			representation, it is still geared towards human readability, which
-			is probably not our priority, as ASTs are mainly consumed by
+			is probably not a major priority, as ASTs are mainly consumed by
 			further analysis stages. <br>
-			Instead, we might opt for a representation using pointers to tagged
-			structures (or polymorphic classes, depending on the language at
-			hand):
+			Another representation which achieves higher efficiency at the cost
+			of reduced accessibility to human readers is the use pointers to
+			tagged structures (or polymorphic classes, depending on the
+			language being used):
 		</p>
 <pre class="code">
 <kwd>enum</kwd> <typ>AstTag</typ> {
@@ -104,15 +105,15 @@
 			This already seems pretty machine-friendly, but we can do better:
 			Observe how a significant amount of the space in our nodes is
 			occupied by pointers to other nodes, with each pointer "owning"
-			the pointed-to node (otherwise we would be dealing with a graph,
+			the pointed-to node (otherwise the nodes would constitute a graph
 			and not a tree). <br>
-			Also observe that nodes consist of a "payload" whose layout depends
-			on their type -
+			Also observe that nodes consist of two main parts. Firstly, a
+			"payload" whose layout depends on node's type:
 			<span class="code"><kwd>const</kwd> <kwd>char</kwd>* name</span> in
 			the case of <span class="code"><typ>AstDefinition</typ></span>,
-			nothing in the case of <span class="code"><typ>AstAdd</typ></span>
-			- and zero or more child nodes, which are currently accessed
-			through pointers.
+			nothing in the case of <span class="code"><typ>AstAdd</typ></span>.
+			And, secondly, zero or more child nodes, which are currently
+			accessed through pointers.
 		</p>
 		<p>
 			We can thus define our nodes as consisting of a tag, a
